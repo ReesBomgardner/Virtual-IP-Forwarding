@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Switch S1" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="Switch" />
+    <module name="Project-2" />
+    <option name="PROGRAM_PARAMETERS" value="&quot;$PROJECT_DIR$/config_files/local.conf&quot; S1" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
