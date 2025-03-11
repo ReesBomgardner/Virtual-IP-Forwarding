@@ -3,6 +3,11 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+/**
+ * A virtual network frame containing a source and
+ * destination MAC and IP addresses and a message
+ */
+
 public class Frame {
     public String sourceMac;
     public String destMac;
@@ -22,6 +27,7 @@ public class Frame {
         this("", "", "", "", "");
     }
 
+    // Deserializes frame from DatagramPacket
     public void readPacket(DatagramPacket packet) {
         ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
 
@@ -34,6 +40,7 @@ public class Frame {
         System.out.printf("[FRAME] Deserialized frame: %s → %s (%s → %s)\n", sourceMac, destMac, sourceIp, destIp);
     }
 
+    // Reads string from ByteBuffer
     private String readString(ByteBuffer buffer) {
         int length = buffer.getInt();
         byte[] bytes = new byte[length];
@@ -41,6 +48,7 @@ public class Frame {
         return new String(bytes);
     }
 
+    // Serializes frame into DatagramPacket for transmission
     public DatagramPacket writePacket(InetAddress destIP, int destPort) {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
 
@@ -55,6 +63,7 @@ public class Frame {
         return new DatagramPacket(payload, payload.length, destIP, destPort);
     }
 
+    // Writes string to ByteBuffer
     private void writeString(ByteBuffer buffer, String value) {
         buffer.putInt(value.getBytes().length);
         buffer.put(value.getBytes());

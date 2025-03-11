@@ -1,6 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A routing table for the router to store entries for
+ * subnets and give the best route for a destination IP
+ */
+
 public class RoutingTable {
     public static class Entry {
         private final String subnet;
@@ -19,12 +24,14 @@ public class RoutingTable {
         }
     }
 
-    private final List<Entry> entries = new ArrayList<>();
+    private final List<Entry> entries = new ArrayList<>(); // List of routing table entries
 
+    // Adds Entry
     public void addEntry(String subnet, String nextHop, String exitPort) {
         entries.add(new Entry(subnet, nextHop, exitPort));
     }
 
+   // Finds best route
     public Entry findBestRoute(String destIp) {
         Entry bestMatch = null;
         for (Entry entry : entries) {
@@ -37,6 +44,7 @@ public class RoutingTable {
         return bestMatch;
     }
 
+    // Writes entries to strings
     @Override
     public String toString() {
         if (entries.isEmpty()) return "No routes configured";

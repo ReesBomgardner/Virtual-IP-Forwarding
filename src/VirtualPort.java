@@ -1,5 +1,9 @@
 import java.net.InetAddress;
 
+/**
+ * A virtual port created from IP addresses and port numbers
+ */
+
 public class VirtualPort {
     public InetAddress ip;
     public int port;

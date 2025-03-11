@@ -3,14 +3,19 @@ import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.util.*;
 
+/**
+ * ConfigParser reads and parses the network config file which contains
+ * device information, links, address resolution mappings, and routing tables
+ */
+
 public class ConfigParser {
-    private final Map<String, VirtualPort> devices = new HashMap<>();
-    private static final Map<String, String> ipToMac = new HashMap<>();
-    private final Map<String, String> macToIp = new HashMap<>();
-    private final Map<String, List<String>> links = new HashMap<>();
-    private final Map<String, RoutingTable> routingTables = new HashMap<>();
-    private final Map<String, String> defaultGateways = new HashMap<>();
-    private String currentRouter = "";
+    private final Map<String, VirtualPort> devices = new HashMap<>(); // Maps device IDs to virtual ports
+    private static final Map<String, String> ipToMac = new HashMap<>(); // Maps virtual IPs to MAC addresses
+    private final Map<String, String> macToIp = new HashMap<>(); // Maps MAC addresses to virtual IPs
+    private final Map<String, List<String>> links = new HashMap<>(); // Maps devices to their neighbors
+    private final Map<String, RoutingTable> routingTables = new HashMap<>(); // Maps router IDs to routing tables
+    private final Map<String, String> defaultGateways = new HashMap<>(); // Maps host IDs to default gateways
+    private String currentRouter = ""; // Tracks the current router being parsed
 
     public ConfigParser(File configFile) {
         try (FileInputStream fis = new FileInputStream(configFile)) {
@@ -22,6 +27,7 @@ public class ConfigParser {
                 line = line.split("#")[0].trim();
                 if (line.isEmpty()) continue;
 
+                // Parse device entries
                 if (line.matches("^[A-Za-z0-9]+\\s+\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+$")) {
                     String[] parts = line.split("\\s+");
                     String[] addr = parts[1].split(":");
@@ -31,6 +37,7 @@ public class ConfigParser {
                     continue;
                 }
 
+                // Parse section headers
                 if (line.equals("LINKS")) {
                     currentSection = "LINKS";
                 } else if (line.equals("ADDRESS RESOLUTION")) {
@@ -42,6 +49,7 @@ public class ConfigParser {
                 } else if (line.equals("DEFAULT GATEWAY")) {
                     currentSection = "DEFAULT_GATEWAY";
                 } else {
+                    // Parse section contents
                     switch (currentSection) {
                         case "LINKS":
                             String[] linkedDevices = line.split("-");
@@ -80,6 +88,8 @@ public class ConfigParser {
             System.err.println("Config error: " + e.getMessage());
         }
     }
+
+    // Returns whatever is in function name
 
     public String getVirtualIp(String mac) {
         return macToIp.get(mac);
