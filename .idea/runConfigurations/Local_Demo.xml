@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local Demo" type="CompoundRunConfigurationType">
+    <toRun name="Local Demo: 1" type="CompoundRunConfigurationType" />
+    <toRun name="Local Demo: 2" type="CompoundRunConfigurationType" />
+    <toRun name="Local Demo: 3" type="CompoundRunConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>
