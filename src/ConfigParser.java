@@ -9,13 +9,13 @@ import java.util.*;
  */
 
 public class ConfigParser {
-    private final Map<String, VirtualPort> devices = new HashMap<>(); // Maps device IDs to virtual ports
-    private static final Map<String, String> ipToMac = new HashMap<>(); // Maps virtual IPs to MAC addresses
-    private final Map<String, String> macToIp = new HashMap<>(); // Maps MAC addresses to virtual IPs
-    private final Map<String, List<String>> links = new HashMap<>(); // Maps devices to their neighbors
-    private final Map<String, RoutingTable> routingTables = new HashMap<>(); // Maps router IDs to routing tables
-    private final Map<String, String> defaultGateways = new HashMap<>(); // Maps host IDs to default gateways
-    private String currentRouter = ""; // Tracks the current router being parsed
+    private final Map<String, VirtualPort> devices = new HashMap<>();
+    private static final Map<String, String> ipToMac = new HashMap<>();
+    private final Map<String, String> macToIp = new HashMap<>();
+    private final Map<String, List<String>> links = new HashMap<>();
+    private final Map<String, RoutingTable> routingTables = new HashMap<>();
+    private final Map<String, String> defaultGateways = new HashMap<>();
+    private String currentRouter = "";
 
     public ConfigParser(File configFile) {
         try (FileInputStream fis = new FileInputStream(configFile)) {
@@ -27,7 +27,6 @@ public class ConfigParser {
                 line = line.split("#")[0].trim();
                 if (line.isEmpty()) continue;
 
-                // Parse device entries
                 if (line.matches("^[A-Za-z0-9]+\\s+\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+$")) {
                     String[] parts = line.split("\\s+");
                     String[] addr = parts[1].split(":");
@@ -37,19 +36,19 @@ public class ConfigParser {
                     continue;
                 }
 
-                // Parse section headers
                 if (line.equals("LINKS")) {
                     currentSection = "LINKS";
                 } else if (line.equals("ADDRESS RESOLUTION")) {
                     currentSection = "ADDRESS";
-                } else if (line.startsWith("R1 TABLE") || line.startsWith("R2 TABLE")) {
+                } else if (line.startsWith("R1 TABLE") || line.startsWith("R2 TABLE") ||
+                        line.startsWith("R3 TABLE") || line.startsWith("R4 TABLE") ||
+                        line.startsWith("R5 TABLE") || line.startsWith("R6 TABLE")) {
                     currentSection = "ROUTING";
                     currentRouter = line.split(" ")[0];
                     routingTables.putIfAbsent(currentRouter, new RoutingTable());
                 } else if (line.equals("DEFAULT GATEWAY")) {
                     currentSection = "DEFAULT_GATEWAY";
                 } else {
-                    // Parse section contents
                     switch (currentSection) {
                         case "LINKS":
                             String[] linkedDevices = line.split("-");
@@ -72,7 +71,7 @@ public class ConfigParser {
                                 String subnet = routeParts[0];
                                 String nextHop = routeParts[1];
                                 String exitPort = routeParts[2];
-                                routingTables.get(currentRouter).addEntry(subnet, nextHop, exitPort);
+                                routingTables.get(currentRouter).addEntry(subnet, nextHop, exitPort, 1);
                             }
                             break;
                         case "DEFAULT_GATEWAY":
@@ -86,10 +85,9 @@ public class ConfigParser {
             }
         } catch (Exception e) {
             System.err.println("Config error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
-    // Returns whatever is in function name
 
     public String getVirtualIp(String mac) {
         return macToIp.get(mac);

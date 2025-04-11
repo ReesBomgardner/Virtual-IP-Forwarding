@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Local Demo: 3" type="CompoundRunConfigurationType">
-    <toRun name="Host HA" type="Application" />
-    <toRun name="Host HB" type="Application" />
-    <toRun name="Host HC" type="Application" />
-    <toRun name="Host HD" type="Application" />
-    <method v="2" />
-  </configuration>
-</component>

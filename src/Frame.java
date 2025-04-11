@@ -13,34 +13,44 @@ public class Frame {
     public String destMac;
     public String sourceIp;
     public String destIp;
-    public String message;
+    public byte[] data;
+    public int type;
 
-    public Frame(String sMAC, String dMAC, String sIP, String dIP, String msg) {
+    public enum FrameType {
+        DISTANCE_VECTOR,
+        USER_MESSAGE
+    }
+
+    public Frame(String sMAC, String dMAC, String sIP, String dIP, byte[] data, int type) {
         this.sourceMac = sMAC;
         this.destMac = dMAC;
         this.sourceIp = sIP;
         this.destIp = dIP;
-        this.message = msg;
+        this.data = data;
+        this.type = type;
     }
 
     public Frame() {
-        this("", "", "", "", "");
+        this("", "", "", "", new byte[0], 1);
     }
 
-    // Deserializes frame from DatagramPacket
     public void readPacket(DatagramPacket packet) {
         ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
 
+        this.type = buffer.get();
         this.sourceMac = readString(buffer);
         this.destMac = readString(buffer);
         this.sourceIp = readString(buffer);
         this.destIp = readString(buffer);
-        this.message = readString(buffer);
 
-        System.out.printf("[FRAME] Deserialized frame: %s → %s (%s → %s)\n", sourceMac, destMac, sourceIp, destIp);
+        int dataLength = buffer.getInt();
+        this.data = new byte[dataLength];
+        buffer.get(this.data);
+
+        System.out.printf("[FRAME] Deserialized frame: %s → %s (%s → %s) Type: %s\n",
+                sourceMac, destMac, sourceIp, destIp, type == 0 ? "ROUTING" : "USER");
     }
 
-    // Reads string from ByteBuffer
     private String readString(ByteBuffer buffer) {
         int length = buffer.getInt();
         byte[] bytes = new byte[length];
@@ -48,22 +58,23 @@ public class Frame {
         return new String(bytes);
     }
 
-    // Serializes frame into DatagramPacket for transmission
     public DatagramPacket writePacket(InetAddress destIP, int destPort) {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
 
+        buffer.put((byte)type);
         writeString(buffer, sourceMac);
         writeString(buffer, destMac);
         writeString(buffer, sourceIp);
         writeString(buffer, destIp);
-        writeString(buffer, message);
+        buffer.putInt(data.length);
+        buffer.put(data);
 
         byte[] payload = Arrays.copyOf(buffer.array(), buffer.position());
-        System.out.printf("[FRAME] Serialized frame: %s → %s (%s → %s)\n", sourceMac, destMac, sourceIp, destIp);
+        System.out.printf("[FRAME] Serialized frame: %s → %s (%s → %s) Type: %s\n",
+                sourceMac, destMac, sourceIp, destIp, type == 0 ? "ROUTING" : "USER");
         return new DatagramPacket(payload, payload.length, destIP, destPort);
     }
 
-    // Writes string to ByteBuffer
     private void writeString(ByteBuffer buffer, String value) {
         buffer.putInt(value.getBytes().length);
         buffer.put(value.getBytes());

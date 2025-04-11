@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Router R5" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="Router" />
+    <module name="Project-2" />
+    <option name="PROGRAM_PARAMETERS" value="&quot;$PROJECT_DIR$/config_files/local.conf&quot; R5" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
